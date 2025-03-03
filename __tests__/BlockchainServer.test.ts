@@ -81,5 +81,14 @@ describe("Blockchain Server Test", () => {
 
     });
 
+    test("POST /blocks/next - Should GET next block info", async () => {
+                
+        const response = await request(app).get("/blocks/next");
+
+        expect(response.status).toBe(200);
+        expect(response.body.index).toBe(1);
+
+    });
+
 
 });

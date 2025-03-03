@@ -1,5 +1,6 @@
 import Block from "./Block";
 import Validation from "../Validation";
+import BlockInfo from "../interfaces/BlockInfo";
 
 /**
  * Blockchain class
@@ -62,6 +63,35 @@ export default class Blockchain {
         this.nextIndex++;
         
         return new Validation();
+    }
+
+    /**
+     * Get amount of the smallest fraction of the coin
+     * @returns fee per transactions
+    */
+    getFeePerTx() : number {
+        return 1;
+    }
+
+    /**
+     * Retrieve next block info
+     * @returns Next block info
+     */
+    getNextBlock() : BlockInfo {
+        const data = new Date().toString();
+        const difficulty = 0;
+        const previousHash = this.getLastBlock().hash;
+        const index = 1;
+        const feePerTx = this.getFeePerTx();
+        const maxDifficulty = 60;
+        return {
+            data,
+            difficulty,
+            previousHash,
+            index,
+            feePerTx,
+            maxDifficulty
+        } as BlockInfo;
     }
 
 }

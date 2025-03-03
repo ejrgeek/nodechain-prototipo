@@ -2,6 +2,8 @@ import Block from "../src/lib/Block";
 
 describe("Block Tests", () => {
 
+    const difficulty = 0;
+    const miner = "ejrgeek";
     let genesis: Block;
 
     beforeAll(() => {
@@ -10,21 +12,24 @@ describe("Block Tests", () => {
 
     test("Should not be valid (invalid index)", () => {
         const block = new Block(-1, genesis.hash, "Block 2");
-        const valid = block.isValid(genesis.hash, genesis.index);
+        block.minePoW(difficulty, miner);
+        const valid = block.isValid(genesis.hash, genesis.index, difficulty);
 
         expect(valid.success).toBeFalsy();
     });
     
     test("Should not be valid (no data)", () => {
         const block = new Block(1, genesis.hash, "");
-        const valid = block.isValid(genesis.hash, genesis.index);
+        block.minePoW(difficulty, miner);
+        const valid = block.isValid(genesis.hash, genesis.index, difficulty);
 
         expect(valid.success).toBeFalsy();
     });
     
     test("Should not be valid (previous hash)", () => {
         const block = new Block(1, "asd", "Genesis Block");
-        const valid = block.isValid(genesis.hash, genesis.index);
+        block.minePoW(difficulty, miner);
+        const valid = block.isValid(genesis.hash, genesis.index, difficulty);
 
         expect(valid.success).toBeFalsy();
     });
@@ -32,22 +37,31 @@ describe("Block Tests", () => {
     test("Should not be valid (invalid timestamp)", () => {
         const block = new Block(1, genesis.hash, "Genesis Block");
         block.timestamp = 0;
-        const valid = block.isValid(genesis.hash, genesis.index);
+        block.minePoW(difficulty, miner);
+        const valid = block.isValid(genesis.hash, genesis.index, difficulty);
 
         expect(valid.success).toBeFalsy();
     });
     
-    test("Should not be valid (invalid hash)", () => {
-        const block = new Block(1, "asd", "Genesis Block");
+    test("Should not be valid (empty hash)", () => {
+        const block = new Block(1, genesis.hash, "Second Block");
+        block.minePoW(difficulty, miner);
         block.hash = "";
-        const valid = block.isValid(genesis.hash, genesis.index);
-
+        const valid = block.isValid(genesis.hash, genesis.index, difficulty);
+        expect(valid.success).toBeFalsy();
+    });
+    
+    test("Should not be valid (no mined)", () => {
+        const block = new Block(1, genesis.hash, "Genesis Block 2");
+        block.hash = "";
+        const valid = block.isValid(genesis.hash, genesis.index, difficulty);
         expect(valid.success).toBeFalsy();
     });
     
     test("Should be valid", () => {
         const block = new Block(1, genesis.hash, "New Block");
-        const valid = block.isValid(genesis.hash, genesis.index);
+        block.minePoW(difficulty, miner);
+        const valid = block.isValid(genesis.hash, genesis.index, difficulty);
 
         expect(valid.success).toBeTruthy();
     });

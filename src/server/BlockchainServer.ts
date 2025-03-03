@@ -1,8 +1,7 @@
-import express from "express";
+import express, {Request, Response, NextFunction} from "express";
 import morgan from "morgan";
 import Blockchain from "../lib/Blockchain";
 import Block from "../lib/Block";
-import Validation from "../lib/Validation";
 
 const PORT = process.env.PORT || 3000;
 
@@ -18,7 +17,7 @@ app.use(express.json());
 
 const blockchain = new Blockchain();
 
-app.get("", (req, res, next) => {
+app.get("", (req: Request, res: Response, next: NextFunction) => {
     res.json({
         numberOfBlocks: blockchain.blocks.length,
         isValid: blockchain.isValid(),
@@ -26,7 +25,7 @@ app.get("", (req, res, next) => {
     });
 });
 
-app.get("/status", (req, res, next) => {
+app.get("/status", (req: Request, res: Response, next: NextFunction) => {
     res.json({
         numberOfBlocks: blockchain.blocks.length,
         isValid: blockchain.isValid(),
@@ -34,7 +33,11 @@ app.get("/status", (req, res, next) => {
     });
 });
 
-app.get("/blocks/:indexOrHash", (req, res, next) => {
+app.get("/blocks/next", (req: Request, res: Response, next: NextFunction) => {
+    return res.json(blockchain.getNextBlock());
+});
+
+app.get("/blocks/:indexOrHash", (req: Request, res: Response, next: NextFunction) => {
     let block;
     if(/^[0-9]+$/.test(req.params.indexOrHash)){
         block = blockchain.blocks[parseInt(req.params.indexOrHash)];
@@ -50,7 +53,7 @@ app.get("/blocks/:indexOrHash", (req, res, next) => {
 
 });
 
-app.post("/blocks", (req, res, next) => {
+app.post("/blocks", (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.data){
         return res.sendStatus(422);
     }
@@ -61,7 +64,7 @@ app.post("/blocks", (req, res, next) => {
 
     const block = new Block(index, blockchain.getLastBlock().hash, req.body.data);
 
-    const blockValidation = block.isValid(blockchain.getLastBlock().hash, blockchain.getLastBlock().index)
+    const blockValidation = block.isValid(blockchain.getLastBlock().hash, blockchain.getLastBlock().index, Blockchain.DIFFICULTY_FACTOR)
     
     /* v8 ignore start */
     if (!blockValidation.success) {        
@@ -83,6 +86,14 @@ app.post("/blocks", (req, res, next) => {
     
 
 });
+
+/* v8 ignore start */
+if (process.argv.includes("--run")) {
+    app.listen(PORT, () => {
+        console.log(`Blockchain server is running at ${PORT}`);
+    });
+}
+/* v8 ignore stop */
 
 export {
     app
