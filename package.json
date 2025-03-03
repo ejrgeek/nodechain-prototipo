@@ -5,8 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "test:coverage": "npm test -- --coverage",
-    "test:badges": "npm run test:coverage && npx jest-coverage-badges",
     "compile": "npx tsc",
     "dev": "npx nodemon --watch ./src/lib/ --exec npx ts-node ./src/lib/blockchain.ts -e ts",
     "start": "node ./dist/lib/blockchain.js",
@@ -30,7 +28,6 @@
   "dependencies": {
     "crypto-js": "^4.2.0",
     "express": "^4.21.2",
-    "jest-coverage-badges": "^1.0.0",
     "morgan": "^1.10.0"
   }
 }
