@@ -6,9 +6,8 @@
   "scripts": {
     "test": "jest",
     "compile": "npx tsc",
-    "dev": "npx nodemon --watch ./src/lib/ --exec npx ts-node ./src/lib/Blockchain.ts -e ts",
-    "start": "node ./dist/lib/blockchain.js",
-    "blockchain": "npx ts-node ./src/server/BlockchainServer.ts --run"
+    "blockchain": "npx ts-node ./src/server/BlockchainServer.ts --run",
+    "miner": "npx ts-node ./src/client/MinerClient.ts"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +25,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "axios": "^1.8.1",
     "crypto-js": "^4.2.0",
     "ecpair": "^3.0.0-rc.0",
     "express": "^4.21.2",

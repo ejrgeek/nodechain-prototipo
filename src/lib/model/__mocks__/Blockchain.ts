@@ -1,6 +1,6 @@
 import Block from "./Block";
-import BlockInfo from "./interfaces/BlockInfo";
-import Validation from "./Validation";
+import Validation from "../Validation";
+import BlockInfo from "../../interfaces/BlockInfo";
 
 /**
  * Blockchain class
@@ -9,19 +9,9 @@ export default class Blockchain {
 
     blocks: Block[];
     nextIndex: number = 0;
-    /**
-     * Other ways to generate a mining difficulty factor can be based 
-     * on the number of current miners on the blockchain or the number 
-     * of pending/already completed transactions.
-     * 
-     * This attr is unique and unchangeable
-     */
-    static readonly DIFFICULTY_FACTOR = 5;
-    // hash length is 64, prevents the entire hash from being filled entirely with zeros over time
-    static readonly MAX_DIFFICULTY_FACTOR = 60;
 
     /**
-     * Inicialize blockchain with genesis block
+     * Inicialize mocked blockchain with genesis block
      */
     constructor() {
         this.blocks = [new Block(this.nextIndex, "", "Genesis Block")];
@@ -29,32 +19,19 @@ export default class Blockchain {
     }
 
     /**
-     * Generates the mining difficulty of the block
-     * @returns block mining difficulty 
-     */
-    __getDifficulty() : number {
-        return Math.ceil(this.blocks.length / Blockchain.DIFFICULTY_FACTOR);
-    }
-
-    /**
-     * Return the last block
+     * Return the lastes mocked block
      */
     getLastBlock() : Block {
         return this.blocks[this.blocks.length-1];
     }
 
-    /**
-     * Method to return a block by hash
-     * @param hash hash to search
-     * @returns the block with the hash
-     */
     getBlock(hash: string) : Block | undefined {
         return this.blocks.find(block => block.hash === hash);
     }
 
 
     /**
-     * Check if the blockchain is valid
+     * Check if the mocked blockchain is valid
      */
     isValid() : Validation {
 
@@ -62,7 +39,7 @@ export default class Blockchain {
             const currentBlock = this.blocks[i];
             const previousBlock = this.blocks[i-1];
 
-            const validation = currentBlock.isValid(previousBlock.hash, previousBlock.index, this.__getDifficulty());
+            const validation = currentBlock.isValid(previousBlock.hash, previousBlock.index);
 
             if(!validation.success){
                 return new Validation(false, `Invalid block [${currentBlock.index}]: ${validation.message}`);
@@ -73,17 +50,18 @@ export default class Blockchain {
     }
 
     /**
-     * Add new block 
+     * Add new mocked block 
      * @param block block that will be added 
      * @returns whether the add was successful or not
      */
     addBlock(block: Block) : Validation {
-        const validation = block.isValid(this.getLastBlock().hash, this.getLastBlock().index, this.__getDifficulty());
-        if(!validation.success) {
-            return new Validation(false, `Invalid block ${validation.message}`);
+        if(block.index <= 0){
+            return new Validation(false, "Invalid mock block");
         }
+        
         this.blocks.push(block);
         this.nextIndex++;
+        
         return new Validation();
     }
 
@@ -101,11 +79,11 @@ export default class Blockchain {
      */
     getNextBlock() : BlockInfo {
         const data = new Date().toString();
-        const difficulty = this.__getDifficulty();
+        const difficulty = 0;
         const previousHash = this.getLastBlock().hash;
-        const index = this.nextIndex;
+        const index = 1;
         const feePerTx = this.getFeePerTx();
-        const maxDifficulty = Blockchain.MAX_DIFFICULTY_FACTOR;
+        const maxDifficulty = 60;
         return {
             data,
             difficulty,

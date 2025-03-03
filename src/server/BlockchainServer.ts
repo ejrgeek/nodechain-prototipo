@@ -1,7 +1,7 @@
 import express, {Request, Response, NextFunction} from "express";
 import morgan from "morgan";
-import Blockchain from "../lib/Blockchain";
-import Block from "../lib/Block";
+import Blockchain from "../lib/model/Blockchain";
+import Block from "../lib/model/Block";
 
 const PORT = process.env.PORT || 3000;
 
@@ -62,9 +62,9 @@ app.post("/blocks", (req: Request, res: Response, next: NextFunction) => {
 
     index++;
 
-    const block = new Block(index, blockchain.getLastBlock().hash, req.body.data);
+    const block = new Block(index, blockchain.getLastBlock().hash, req.body.data, req.body.miner, req.body.nonce);
 
-    const blockValidation = block.isValid(blockchain.getLastBlock().hash, blockchain.getLastBlock().index, Blockchain.DIFFICULTY_FACTOR)
+    const blockValidation = block.isValid(blockchain.getLastBlock().hash, blockchain.getLastBlock().index, blockchain.getDifficulty());
     
     /* v8 ignore start */
     if (!blockValidation.success) {        
