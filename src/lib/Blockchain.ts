@@ -1,6 +1,7 @@
 import Block from "./Block";
 import TransactionTypeEnum from "./enum/TransactionTypeEnum";
 import BlockInfo from "./interfaces/BlockInfo";
+import TransactionSearch from "./interfaces/TransactionSearch";
 import Transaction from "./Transaction";
 import Validation from "./Validation";
 
@@ -36,6 +37,11 @@ export default class Blockchain {
         this.nextIndex++;
     }
 
+    /**
+     * Method to validate and add transactions to mempool
+     * @param transaction validate and add to mempool
+     * @returns if transaction is valid
+     */
     addTransaction(transaction: Transaction) : Validation {
         const validation = transaction.isValid();
 
@@ -54,6 +60,26 @@ export default class Blockchain {
         this.mempool.push(transaction);
 
         return new Validation(true, transaction.hash);
+    }
+
+    getTransaction(hash: string) : TransactionSearch {
+        const mempoolIndex = this.mempool.findIndex(tx => tx.hash === hash);
+        if (mempoolIndex !== -1){
+            return {
+                mempoolIndex,
+                transaction: this.mempool[mempoolIndex]
+            } as TransactionSearch;
+        }
+
+        const blockIndex = this.blocks.findIndex(blk => blk.transactions.some(tx => tx.hash === hash));
+        if (blockIndex !== -1){
+            return {
+                blockIndex,
+                transaction: this.blocks[blockIndex].transactions.find(tx => tx.hash === hash)
+            } as TransactionSearch;
+        }
+
+        return { blockIndex: -1, mempoolIndex: -1} as TransactionSearch;
     }
 
     /**

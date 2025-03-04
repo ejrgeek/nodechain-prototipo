@@ -59,6 +59,18 @@ app.get("/blocks/:indexOrHash", (req: Request, res: Response, next: NextFunction
 
 });
 
+app.get("/transactions/:hash?", (req: Request, res: Response, next: NextFunction) => {
+    if(req.params.hash){
+        return res.json(blockchain.getTransaction(req.params.hash));
+    }
+
+    return res.json({
+        next: blockchain.mempool.slice(0, Blockchain.MAX_TX_PER_BLOCK),
+        total: blockchain.mempool.length,
+    });
+
+});
+
 app.post("/blocks", (req: Request, res: Response, next: NextFunction) => {
 
     if (!req.body.transactions){
@@ -102,6 +114,24 @@ app.post("/blocks", (req: Request, res: Response, next: NextFunction) => {
     
 
 });
+
+app.post("/transactions", (req: Request, res: Response, next: NextFunction) => {
+    if (req.body.hash === undefined){
+        return res.sendStatus(422);
+    }
+
+    const tx = new Transaction(req.body as Transaction);
+
+    const validation = blockchain.addTransaction(tx);
+
+    if(validation.success){
+        res.status(201).json(tx);
+    } else {
+        res.status(400).json(validation);
+    }
+
+});
+
 
 /* v8 ignore start */
 if (process.argv.includes("--run")) {
