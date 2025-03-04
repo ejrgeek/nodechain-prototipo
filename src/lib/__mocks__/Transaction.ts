@@ -15,7 +15,7 @@ export default class Transaction {
     constructor(tx?: Transaction){
         this.type = tx?.type || TransactionTypeEnum.REGULAR;
         this.timestamp = tx?.timestamp || Date.now();
-        this.data = tx?.data || "tx1";
+        this.data = tx?.data || "";
         this.hash = tx?.hash || this.getHash();
     }
 

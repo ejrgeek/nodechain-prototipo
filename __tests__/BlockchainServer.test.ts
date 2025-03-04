@@ -120,5 +120,91 @@ describe("Blockchain Server Test", () => {
 
     });
 
+    test("POST /transactions - Should ADD transactions", async () =>{
+
+        const tx = {
+            "hash": "asx",
+            "data": "Teste de criação de transação 1",
+        }
+
+        const response = await request(app)
+                .post("/transactions")
+                .send(tx);
+
+        expect(response.status).toBe(201);
+
+    });
+
+    test("POST /transactions - Should NOT ADD transactions", async () =>{
+
+        const tx = {
+            hash: "",
+            data: "",
+        }
+
+        const response = await request(app)
+                .post("/transactions")
+                .send(tx);
+        
+        expect(response.status).toBe(422);
+
+    });
+
+    test("POST /transactions - Should NOT ADD transactions (no hash)", async () =>{
+
+        const tx = {}
+
+        const response = await request(app)
+                .post("/transactions")
+                .send(tx);
+        
+        expect(response.status).toBe(422);
+
+    });
+
+    test("GET /transactions/:hash? - Should GET transaction by hash", async () =>{
+
+        const tx = {
+            "hash": "asx",
+            "data": "Teste de criação de transação 1",
+        }
+
+        const response = await request(app)
+                .post("/transactions")
+                .send(tx);
+        
+        const hash = response.body.hash;
+
+        const responseSearchUrl = await request(app).get(`/transactions/${hash}`);
+
+        expect(responseSearchUrl.body.transaction.hash).toBe(hash)
+
+    });
+    
+    test("GET /transactions - Should GET transactions", async () =>{
+
+        const tx = {
+            "hash": "asx",
+            "data": "Teste de criação de transação 1",
+        }
+
+        const response = await request(app)
+                .post("/transactions")
+                .send(tx);
+        
+        const hash = response.body.hash;
+
+        const responseSearchUrl = await request(app).get(`/transactions`);
+
+        expect(responseSearchUrl.body.total).toBeGreaterThan(0);
+
+    });
+
+    test("GET /transactions/:hash? - Should NOT GET transactions by hash", async () =>{
+
+        
+
+    });
+
 
 });

@@ -3,6 +3,7 @@ import Validation from "../Validation";
 import BlockInfo from "../interfaces/BlockInfo";
 import Transaction from "../Transaction";
 import TransactionTypeEnum from "../enum/TransactionTypeEnum";
+import TransactionSearch from "../interfaces/TransactionSearch";
 
 /**
  * Blockchain class
@@ -10,11 +11,13 @@ import TransactionTypeEnum from "../enum/TransactionTypeEnum";
 export default class Blockchain {
 
     blocks: Block[];
+    mempool: Transaction[];
     nextIndex: number = 0;
     /**
      * Inicialize mocked blockchain with genesis block
      */
     constructor() {
+        this.mempool = [];
         this.blocks = [new Block(this.nextIndex, "", [new Transaction({
             data: "TX1",
             type: TransactionTypeEnum.FEE,
@@ -22,6 +25,42 @@ export default class Blockchain {
         this.nextIndex++;
     }
 
+    /**
+     * Method to validate and add transactions to mempool
+     * @param transaction validate and add to mempool
+     * @returns if transaction is valid
+     */
+    addTransaction(transaction: Transaction) : Validation {
+        const validation = transaction.isValid();
+
+        if (!validation.success) {
+            return new Validation(false, `Invalid tx: ${validation.message}`);
+        }
+
+        this.mempool.push(transaction);
+
+        return new Validation(true, transaction.hash);
+    }
+    
+    getTransaction(hash: string) : TransactionSearch {
+        const mempoolIndex = this.mempool.findIndex(tx => tx.hash === hash);
+        if (mempoolIndex !== -1){
+            return {
+                mempoolIndex,
+                transaction: this.mempool[mempoolIndex]
+            } as TransactionSearch;
+        }
+
+        const blockIndex = this.blocks.findIndex(blk => blk.transactions.some(tx => tx.hash === hash));
+        if (blockIndex !== -1){
+            return {
+                blockIndex,
+                transaction: this.blocks[blockIndex].transactions.find(tx => tx.hash === hash)
+            } as TransactionSearch;
+        }
+
+        return { blockIndex: -1, mempoolIndex: -1} as TransactionSearch;
+    }
 
     /**
      * Generates the mining difficulty of the block

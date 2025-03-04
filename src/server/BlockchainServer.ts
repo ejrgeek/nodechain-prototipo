@@ -127,7 +127,7 @@ app.post("/transactions", (req: Request, res: Response, next: NextFunction) => {
     if(validation.success){
         res.status(201).json(tx);
     } else {
-        res.status(400).json(validation);
+        res.status(422).json(validation);
     }
 
 });
