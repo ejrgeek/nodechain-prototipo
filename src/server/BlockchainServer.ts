@@ -33,6 +33,7 @@ app.get("", (req: Request, res: Response, next: NextFunction) => {
 
 app.get("/status", (req: Request, res: Response, next: NextFunction) => {
     res.json({
+        numberOfMempool: blockchain.mempool.length,
         numberOfBlocks: blockchain.blocks.length,
         isValid: blockchain.isValid(),
         lastBlock: blockchain.getLastBlock(),

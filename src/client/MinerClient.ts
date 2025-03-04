@@ -20,6 +20,14 @@ async function minePoW() {
     console.log("[?] Retrieving information from the next block ...");
     
     const { data } = await axios.get(`${BLOCKCHAIN_SERVER}/blocks/next`);
+
+    if (!data) {
+        console.log("[?] No tx found. Waiting ...");
+        return setTimeout(() => {
+            minePoW();
+        }, 5000);
+    }
+
     const blockInfo = data as BlockInfo;
 
     const newBlock = Block.fromBlockInfo(blockInfo, MINER_WALLET.publicKey);
