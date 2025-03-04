@@ -9,13 +9,21 @@ export default class Blockchain {
 
     blocks: Block[];
     nextIndex: number = 0;
-
     /**
      * Inicialize mocked blockchain with genesis block
      */
     constructor() {
         this.blocks = [new Block(this.nextIndex, "", "Genesis Block")];
         this.nextIndex++;
+    }
+
+    
+    /**
+     * Generates the mining difficulty of the block
+     * @returns block mining difficulty 
+     */
+    getDifficulty() : number {
+        return 1;
     }
 
     /**

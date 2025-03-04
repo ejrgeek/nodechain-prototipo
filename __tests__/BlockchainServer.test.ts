@@ -48,7 +48,7 @@ describe("Blockchain Server Test", () => {
 
     test("POST /blocks/ - Should add block", async () => {
         
-        const block = new Block(1, "abc", "New block");
+        const block = new Block(1, "abc", "New block", "ejrgeek", 0);
         
         const response = await request(app)
             .post("/blocks/")

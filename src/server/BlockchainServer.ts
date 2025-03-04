@@ -1,9 +1,14 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express, {Request, Response, NextFunction} from "express";
 import morgan from "morgan";
 import Blockchain from "../lib/model/Blockchain";
 import Block from "../lib/model/Block";
 
-const PORT = process.env.PORT || 3000;
+/* v8 ignore start */
+const PORT = parseInt(`${process.env.BLOCKCHAIN_PORT || 3000}`);
+/* v8 ignore stop */
 
 const app = express();
 
