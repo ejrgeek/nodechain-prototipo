@@ -12,7 +12,7 @@ export default class Block {
     timestamp: number;
     hash: string;
     previousHash: string;
-    transaction: Transaction[];
+    transactions: Transaction[];
     nonce: number;
     miner: string;
 
@@ -21,13 +21,13 @@ export default class Block {
      * Block Constructor
      * @param index block position
      * @param previousHash previous block hash
-     * @param transaction block content
+     * @param transactions block content
      */
-    constructor(index: number, previousHash: string, transaction: Transaction[] = [], miner: string = "", nonce: number = 0, ) {
+    constructor(index: number, previousHash: string, transactions: Transaction[] = [], miner: string = "", nonce: number = 0, ) {
         this.index = index;
         this.timestamp = Date.now();
         this.previousHash = previousHash;
-        this.transaction = transaction;
+        this.transactions = transactions;
         this.nonce = nonce;
         this.miner = miner;
         this.hash = this.getHash();
@@ -38,8 +38,8 @@ export default class Block {
      * @returns block hash
      */
     getHash() : string {
-        const txs = this.transaction && this.transaction.length
-            ? this.transaction.map( tx => tx.hash ).reduce((a,b) => a+b)
+        const txs = this.transactions && this.transactions.length
+            ? this.transactions.map( tx => tx.hash ).reduce((a,b) => a+b)
             : "";
 
         return sha256(this.index + txs + this.timestamp + this.previousHash + this.miner + this.nonce).toString();
@@ -79,17 +79,19 @@ export default class Block {
      * @returns if the block is valid
      */
     isValid(previousHash: string, previousIndex: number, difficulty: number) : Validation {
-        if (this.transaction && this.transaction.length) {
-            if(this.transaction.filter(tx => tx.type === TransactionTypeEnum.FEE).length > 1){
+        if (this.transactions && this.transactions.length) {
+            if(this.transactions.filter(tx => tx.type === TransactionTypeEnum.FEE).length > 1){
                 return new Validation(false, "Too many fees.");    
             }
 
-            const validations = this.transaction.map(tx => tx.isValid());
+            const validations = this.transactions.map(tx => tx.isValid());
             const validationsErros = validations.filter(v => !v.success).map(v => v.message);
 
             if(validationsErros.length > 0){
                 return new Validation(false, `Invalid block due to invalid transaction. Errors: ${validationsErros.reduce((a,b) => a+" "+b)}`);
             }
+        } else {
+            return new Validation(false, "No transactions.");
         }
 
         if (previousIndex !== this.index-1) {

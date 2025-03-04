@@ -1,3 +1,5 @@
+import TransactionTypeEnum from "../enum/TransactionTypeEnum";
+import Transaction from "../Transaction";
 import Validation from "../Validation";
 
 /**
@@ -8,7 +10,7 @@ export default class Block {
     timestamp: number;
     hash: string;
     previousHash: string;
-    data: string;
+    transactions: Transaction[];
 
 
     /**
@@ -17,11 +19,11 @@ export default class Block {
      * @param previousHash previous block hash
      * @param data block content
      */
-    constructor(index: number, previousHash: string, data: string) {
+    constructor(index: number, previousHash: string, transactions: Transaction[] = []) {
         this.index = index;
         this.timestamp = Date.now();
         this.previousHash = previousHash;
-        this.data = data;
+        this.transactions = transactions;
         this.hash = this.getHash();
     }
 
@@ -40,6 +42,20 @@ export default class Block {
      * @returns 
      */
     isValid(previousHash: string, previousIndex: number) : Validation {
+        if (this.transactions && this.transactions.length) {
+            if(this.transactions.filter(tx => tx.type === TransactionTypeEnum.FEE).length > 1){
+                return new Validation(false, "Too many fees.");    
+            }
+
+            const validations = this.transactions.map(tx => tx.isValid());
+            const validationsErros = validations.filter(v => !v.success).map(v => v.message);
+
+            if(validationsErros.length > 0){
+                return new Validation(false, `Invalid block due to invalid transaction. Errors: ${validationsErros.reduce((a,b) => a+" "+b)}`);
+            }
+        } else {
+            return new Validation(false, "No transactions.");
+        }
         if (previousIndex < 0 || !previousHash || this.index <= 0) {
             return new Validation(false, "Invalid mock block.");
         }

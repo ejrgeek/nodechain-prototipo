@@ -1,7 +1,10 @@
 import request from "supertest";
 import {app} from "../src/server/BlockchainServer";
 import Block from "../src/lib/Block";
+import Transaction from "../src/lib/Transaction";
+import TransactionTypeEnum from "../src/lib/enum/TransactionTypeEnum";
 
+jest.mock("../src/lib/Transaction");
 jest.mock("../src/lib/Block");
 jest.mock("../src/lib/Blockchain");
 
@@ -47,8 +50,12 @@ describe("Blockchain Server Test", () => {
     });
 
     test("POST /blocks/ - Should add block", async () => {
+
+        const tx = new Transaction({
+            data: "Block 2",
+        } as Transaction);
         
-        const block = new Block(1, "abc", "New block", "ejrgeek", 0);
+        const block = new Block(1, "abc", [tx], "ejrgeek", 0);
         
         const response = await request(app)
             .post("/blocks/")
@@ -70,8 +77,31 @@ describe("Blockchain Server Test", () => {
     });
 
     test("POST /blocks/ - Should NOT add invalid block", async () => {
+
+        const transaction = new Transaction();
+        transaction.hash = "";
         
-        const block = new Block(0, "", "");
+        const block = new Block(0, "");
+        
+        const response = await request(app)
+            .post("/blocks/")
+            .send(block);
+
+        expect(response.status).toBe(422);
+
+    });
+
+    test("POST /blocks/ - Should NOT add invalid block (many fee)", async () => {
+
+        const transaction1 = new Transaction({
+            type: TransactionTypeEnum.FEE,
+        } as Transaction);
+        const transaction2 = new Transaction({
+            type: TransactionTypeEnum.FEE,
+        } as Transaction);
+        
+        
+        const block = new Block(0, "", [transaction1, transaction2]);
         
         const response = await request(app)
             .post("/blocks/")

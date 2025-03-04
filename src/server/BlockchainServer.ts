@@ -5,6 +5,7 @@ import express, {Request, Response, NextFunction} from "express";
 import morgan from "morgan";
 import Blockchain from "../lib/Blockchain";
 import Block from "../lib/Block";
+import Transaction from "../lib/Transaction";
 
 /* v8 ignore start */
 const PORT = parseInt(`${process.env.BLOCKCHAIN_PORT || 3000}`);
@@ -59,20 +60,30 @@ app.get("/blocks/:indexOrHash", (req: Request, res: Response, next: NextFunction
 });
 
 app.post("/blocks", (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body.data){
+
+    if (!req.body.transactions){
         return res.sendStatus(422);
     }
-
+    
     let index = blockchain.getLastBlock().index;
 
     index++;
 
-    const block = new Block(index, blockchain.getLastBlock().hash, req.body.data, req.body.miner, req.body.nonce);
+    const blockTxs = req.body.transactions.map((tx: any) => 
+        new Transaction({
+            type: tx.type, 
+            timestamp: tx.timestamp, 
+            data: tx.data, 
+            hash: tx.hash
+        } as Transaction)
+    );
+    const block = new Block(index, blockchain.getLastBlock().hash, blockTxs, req.body.miner, req.body.nonce);
+
 
     const blockValidation = block.isValid(blockchain.getLastBlock().hash, blockchain.getLastBlock().index, blockchain.getDifficulty());
     
     /* v8 ignore start */
-    if (!blockValidation.success) {        
+    if (!blockValidation.success) { 
         return res.status(422).send({
             "message": blockValidation.message
         });
