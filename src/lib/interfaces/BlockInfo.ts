@@ -1,3 +1,4 @@
+import Transaction from "../Transaction";
 
 /**
  * BlockInfo model interface
@@ -8,5 +9,5 @@ export default interface BlockInfo {
     difficulty: number;
     maxDifficulty: number;
     feePerTx: number;
-    data: string;
+    transactions: Transaction[];
 }

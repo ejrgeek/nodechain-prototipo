@@ -1,7 +1,7 @@
-import Block from "../src/lib/model/Block";
-import Blockchain from "../src/lib/model/Blockchain";
+import Block from "../src/lib/Block";
+import Blockchain from "../src/lib/Blockchain";
 
-jest.mock('../src/lib/model/Block')
+jest.mock('../src/lib/Block')
 
 describe("Blockchain Testes", () => {
 

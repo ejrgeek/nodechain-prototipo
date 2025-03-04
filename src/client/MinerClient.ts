@@ -3,7 +3,7 @@ dotenv.config();
 
 import axios from "axios";
 import BlockInfo from "../lib/interfaces/BlockInfo";
-import Block from "../lib/model/Block";
+import Block from "../lib/Block";
 
 const BLOCKCHAIN_SERVER = process.env.BLOCKCHAIN_SERVER || "https://localhost:3000";
 

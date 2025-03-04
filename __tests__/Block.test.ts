@@ -1,5 +1,5 @@
 import BlockInfo from "../src/lib/interfaces/BlockInfo";
-import Block from "../src/lib/model/Block";
+import Block from "../src/lib/Block";
 
 describe("Block Tests", () => {
 

@@ -1,9 +1,9 @@
 import request from "supertest";
 import {app} from "../src/server/BlockchainServer";
-import Block from "../src/lib/model/Block";
+import Block from "../src/lib/Block";
 
-jest.mock("../src/lib/model/Block");
-jest.mock("../src/lib/model/Blockchain");
+jest.mock("../src/lib/Block");
+jest.mock("../src/lib/Blockchain");
 
 describe("Blockchain Server Test", () => {
 

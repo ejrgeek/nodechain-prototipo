@@ -1,5 +1,7 @@
 import Block from "./Block";
-import BlockInfo from "../interfaces/BlockInfo";
+import TransactionTypeEnum from "./enum/TransactionTypeEnum";
+import BlockInfo from "./interfaces/BlockInfo";
+import Transaction from "./Transaction";
 import Validation from "./Validation";
 
 /**
@@ -24,7 +26,10 @@ export default class Blockchain {
      * Inicialize blockchain with genesis block
      */
     constructor() {
-        this.blocks = [new Block(this.nextIndex, "", "Genesis Block")];
+        this.blocks = [new Block(this.nextIndex, "", [new Transaction({
+            type: TransactionTypeEnum.FEE,
+            data: new Date().toString()
+        } as Transaction)])];
         this.nextIndex++;
     }
 
@@ -100,14 +105,16 @@ export default class Blockchain {
      * @returns Next block info
      */
     getNextBlock() : BlockInfo {
-        const data = new Date().toString();
+        const transactions = [new Transaction({
+            data: new Date().toString(),
+        } as Transaction)];
         const difficulty = this.getDifficulty();
         const previousHash = this.getLastBlock().hash;
         const index = this.nextIndex;
         const feePerTx = this.getFeePerTx();
         const maxDifficulty = Blockchain.MAX_DIFFICULTY_FACTOR;
         return {
-            data,
+            transactions,
             difficulty,
             previousHash,
             index,
