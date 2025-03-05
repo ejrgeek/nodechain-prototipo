@@ -9,7 +9,7 @@ const ECPair = ECPairFactory(secp);
  */
 export default class Wallet {
 
-    primaryKey: string;
+    privateKey: string;
     publicKey: string;
 
     constructor(wifOrPrivateKey?: string) {
@@ -26,7 +26,7 @@ export default class Wallet {
             keys = ECPair.makeRandom();
         }
 
-        this.primaryKey = Buffer.from(keys.privateKey as Uint8Array<ArrayBufferLike>).toString("hex");
+        this.privateKey = Buffer.from(keys.privateKey as Uint8Array<ArrayBufferLike>).toString("hex");
         this.publicKey = Buffer.from(keys.publicKey).toString("hex");
 
     }

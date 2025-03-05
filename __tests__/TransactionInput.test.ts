@@ -17,7 +17,7 @@ describe("Transaction Input Tests", () => {
             fromAddress: carlinhosWallet.publicKey,
         } as TransactionInput);
 
-        txInput.sign(carlinhosWallet.primaryKey);
+        txInput.sign(carlinhosWallet.privateKey);
 
         const valid = txInput.isValid();
         expect(valid.success).toBeTruthy();
@@ -41,7 +41,7 @@ describe("Transaction Input Tests", () => {
             fromAddress: carlinhosWallet.publicKey,
         } as TransactionInput);
 
-        txInput.sign(carlinhosWallet.primaryKey);
+        txInput.sign(carlinhosWallet.privateKey);
 
         const valid = txInput.isValid();
         expect(valid.success).toBeFalsy();
@@ -51,7 +51,7 @@ describe("Transaction Input Tests", () => {
     test("Should NOT be valid (constructor)", () => {
         const txInput = new TransactionInput();
 
-        txInput.sign(carlinhosWallet.primaryKey);
+        txInput.sign(carlinhosWallet.privateKey);
 
         const valid = txInput.isValid();
         expect(valid.success).toBeFalsy();
@@ -64,7 +64,7 @@ describe("Transaction Input Tests", () => {
             fromAddress: carlinhosWallet.publicKey,
         } as TransactionInput);
     
-        txInput.sign(atacanteWallet.primaryKey);
+        txInput.sign(atacanteWallet.privateKey);
     
         const valid = txInput.isValid();
         expect(valid.success).toBeFalsy();

@@ -13,15 +13,15 @@ describe("Wallet Tests", () => {
     test("Should generate valid wallet", () => {
         
         const wallet = new Wallet();
-        expect(wallet.primaryKey).toBeTruthy();
-        expect(wallet.primaryKey).toHaveLength(64);
+        expect(wallet.privateKey).toBeTruthy();
+        expect(wallet.privateKey).toHaveLength(64);
         expect(wallet.publicKey).toBeTruthy();
 
     });
 
-    test("Should recover wallet (primaryKey)", () => {
+    test("Should recover wallet (privateKey)", () => {
         
-        const wallet = new Wallet(ashWallet.primaryKey);
+        const wallet = new Wallet(ashWallet.privateKey);
     
         expect(wallet.publicKey).toEqual(ashWallet.publicKey);
 
@@ -31,7 +31,7 @@ describe("Wallet Tests", () => {
         
         const wallet = new Wallet(wif);
     
-        expect(wallet.primaryKey).toBeTruthy();
+        expect(wallet.privateKey).toBeTruthy();
         expect(wallet.publicKey).toBeTruthy();
 
     });
