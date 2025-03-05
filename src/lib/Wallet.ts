@@ -24,12 +24,9 @@ export default class Wallet {
             }
         } else {
             keys = ECPair.makeRandom();
-            if (!keys.privateKey) {
-                throw new Error("Failed to generate private key");
-            }
         }
 
-        this.primaryKey = Buffer.from(keys.privateKey).toString("hex");
+        this.primaryKey = Buffer.from(keys.privateKey as Uint8Array<ArrayBufferLike>).toString("hex");
         this.publicKey = Buffer.from(keys.publicKey).toString("hex");
 
     }

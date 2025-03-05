@@ -3,6 +3,7 @@ import TransactionTypeEnum from "./enum/TransactionTypeEnum";
 import BlockInfo from "./interfaces/BlockInfo";
 import TransactionSearch from "./interfaces/TransactionSearch";
 import Transaction from "./Transaction";
+import TransactionInput from "./TransactionInput";
 import Validation from "./Validation";
 
 /**
@@ -32,7 +33,7 @@ export default class Blockchain {
         this.mempool = [];
         this.blocks = [new Block(this.nextIndex, "", [new Transaction({
             type: TransactionTypeEnum.FEE,
-            data: new Date().toString()
+            txInput: new TransactionInput()
         } as Transaction)])];
         this.nextIndex++;
     }

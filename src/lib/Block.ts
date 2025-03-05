@@ -23,7 +23,7 @@ export default class Block {
      * @param previousHash previous block hash
      * @param transactions block content
      */
-    constructor(index: number, previousHash: string, transactions: Transaction[] = [], miner: string = "", nonce: number = 0, ) {
+    constructor(index: number, previousHash: string, transactions: Transaction[] = [], miner: string = "", nonce: number = 0,) {
         this.index = index;
         this.timestamp = Date.now();
         this.previousHash = previousHash;
@@ -37,9 +37,9 @@ export default class Block {
      * Generates the block hash
      * @returns block hash
      */
-    getHash() : string {
+    getHash(): string {
         const txs = this.transactions && this.transactions.length
-            ? this.transactions.map( tx => tx.hash ).reduce((a,b) => a+b)
+            ? this.transactions.map(tx => tx.hash).reduce((a, b) => a + b)
             : "";
 
         return sha256(this.index + txs + this.timestamp + this.previousHash + this.miner + this.nonce).toString();
@@ -51,7 +51,7 @@ export default class Block {
      * @returns hash prefix
      */
     /* v8 ignore start */
-    __getHashPrefix(difficulty: number) : string {
+    __getHashPrefix(difficulty: number): string {
         return new Array(difficulty + 1).join("0");
     }
     /* v8 ignore stop */
@@ -61,7 +61,7 @@ export default class Block {
      * @param difficulty the blockchain current difficulty
      * @param miner miner wallet address
      */
-    minePoW(difficulty: number, miner: string) : void {
+    minePoW(difficulty: number, miner: string): void {
         this.miner = miner;
         const hashPrefix = this.__getHashPrefix(difficulty);
 
@@ -78,32 +78,32 @@ export default class Block {
      * @param difficulty the blockchain current difficulty
      * @returns if the block is valid
      */
-    isValid(previousHash: string, previousIndex: number, difficulty: number) : Validation {
+    isValid(previousHash: string, previousIndex: number, difficulty: number): Validation {
         if (this.transactions && this.transactions.length) {
-            if(this.transactions.filter(tx => tx.type === TransactionTypeEnum.FEE).length > 1){
-                return new Validation(false, "Too many fees.");    
+            if (this.transactions.filter(tx => tx.type === TransactionTypeEnum.FEE).length > 1) {
+                return new Validation(false, "Too many fees.");
             }
 
             const validations = this.transactions.map(tx => tx.isValid());
             const validationsErros = validations.filter(v => !v.success).map(v => v.message);
 
-            if(validationsErros.length > 0){
-                return new Validation(false, `Invalid block due to invalid transaction. Errors: ${validationsErros.reduce((a,b) => a+" "+b)}`);
+            if (validationsErros.length > 0) {
+                return new Validation(false, `Invalid block due to invalid transaction. Errors: ${validationsErros.reduce((a, b) => a + " " + b)}`);
             }
         } else {
             return new Validation(false, "No transactions.");
         }
 
-        if (previousIndex !== this.index-1) {
+        if (previousIndex !== this.index - 1) {
             return new Validation(false, "Invalid index.");
         }
-        if (this.timestamp < 1){
+        if (this.timestamp < 1) {
             return new Validation(false, "Invalid timestamp.");
         }
         if (this.previousHash !== previousHash) {
             return new Validation(false, "Invalid previous hash.");
         }
-        if (!this.nonce || !this.miner){
+        if (!this.nonce || !this.miner) {
             return new Validation(false, "No mined.");
         }
 
@@ -120,8 +120,13 @@ export default class Block {
      * @param blockInfo blockInfo retrieve from next block
      * @returns new Block with blockInfo information
      */
-    static fromBlockInfo(blockInfo: BlockInfo, miner: string): Block {        
-        const block = new Block(blockInfo.index, blockInfo.previousHash, blockInfo.transactions, miner);        
+    static fromBlockInfo(blockInfo: BlockInfo, miner: string): Block {
+        const block = new Block(
+            blockInfo.index, 
+            blockInfo.previousHash, 
+            blockInfo.transactions.map(tx => new Transaction(tx)), 
+            miner
+        );
         return block;
     }
 

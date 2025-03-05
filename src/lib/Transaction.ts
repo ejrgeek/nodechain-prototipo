@@ -11,19 +11,20 @@ export default class Transaction {
     type: TransactionTypeEnum;
     timestamp: number;
     hash: string;
-    txInput: TransactionInput;
+    txInput: TransactionInput | undefined;
     to: string;
 
     constructor(tx?: Transaction){
         this.type = tx?.type || TransactionTypeEnum.REGULAR;
         this.timestamp = tx?.timestamp || Date.now();
         this.to = tx?.to || "";
+        this.txInput = tx?.txInput ? new TransactionInput(tx.txInput) : new TransactionInput();
         this.hash = tx?.hash || this.getHash();
-        this.txInput = new TransactionInput(tx?.txInput);
     }
 
     getHash(): string {
-        return sha256(this.type+this.to+this.txInput.getHash()+this.timestamp).toString();
+        const from = this.txInput ? this.txInput.getHash() : "";
+        return sha256(this.type + this.to + from + this.timestamp).toString();
     }
 
     isValid() : Validation {
@@ -35,7 +36,12 @@ export default class Transaction {
             return new Validation(false, "Invalid To.");
         }
 
-        
+        if(this.txInput){
+            const validation = this.txInput.isValid();
+            if (!validation.success) {
+                return new Validation(false, `Invalid tx: ${validation.message}`);
+            }
+        }
 
         return new Validation();
     }

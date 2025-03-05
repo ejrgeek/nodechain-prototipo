@@ -29,9 +29,11 @@ export default class TransactionInput {
      * @param privateKey from private key
      */
     sign(privateKey: string) : void {
-        this.signature = ECPair.fromPrivateKey(Buffer.from(privateKey, "hex"))
-        .sign(Buffer.from(this.getHash(), "hex"))
-        .toString("hex");
+
+        const signa = ECPair.fromPrivateKey(Buffer.from(privateKey, "hex"))
+        .sign(Buffer.from(this.getHash(), "hex"));
+
+        this.signature = Buffer.from(signa).toString("hex");
     }
 
     /**

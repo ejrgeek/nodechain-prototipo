@@ -4,6 +4,7 @@ import BlockInfo from "../interfaces/BlockInfo";
 import Transaction from "../Transaction";
 import TransactionTypeEnum from "../enum/TransactionTypeEnum";
 import TransactionSearch from "../interfaces/TransactionSearch";
+import TransactionInput from "../TransactionInput";
 
 /**
  * Blockchain class
@@ -19,7 +20,7 @@ export default class Blockchain {
     constructor() {
         this.mempool = [];
         this.blocks = [new Block(this.nextIndex, "", [new Transaction({
-            data: "TX1",
+            txInput: new TransactionInput(),
             type: TransactionTypeEnum.FEE,
         } as Transaction)])];
         this.nextIndex++;
@@ -131,7 +132,7 @@ export default class Blockchain {
      */
     getNextBlock(): BlockInfo {
         const transactions = [new Transaction({
-            data: new Date().toString(),
+            txInput: new TransactionInput(),
         } as Transaction)];
         const difficulty = 0;
         const previousHash = this.getLastBlock().hash;

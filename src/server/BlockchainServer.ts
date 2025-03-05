@@ -6,6 +6,7 @@ import morgan from "morgan";
 import Blockchain from "../lib/Blockchain";
 import Block from "../lib/Block";
 import Transaction from "../lib/Transaction";
+import TransactionInput from "../lib/TransactionInput";
 
 /* v8 ignore start */
 const PORT = parseInt(`${process.env.BLOCKCHAIN_PORT || 3000}`);
@@ -86,7 +87,7 @@ app.post("/blocks", (req: Request, res: Response, next: NextFunction) => {
         new Transaction({
             type: tx.type, 
             timestamp: tx.timestamp, 
-            data: tx.data, 
+            txInput: new TransactionInput(), 
             hash: tx.hash
         } as Transaction)
     );
@@ -122,6 +123,8 @@ app.post("/transactions", (req: Request, res: Response, next: NextFunction) => {
     }
 
     const tx = new Transaction(req.body as Transaction);
+
+    tx.txInput = new TransactionInput(tx.txInput);
 
     const validation = blockchain.addTransaction(tx);
 
