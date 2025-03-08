@@ -4,6 +4,9 @@ import axios from "axios";
 import Wallet from "../lib/Wallet";
 import readline from "readline";
 import { exit } from "process";
+import Transaction from "../lib/Transaction";
+import TransactionTypeEnum from "../lib/enum/TransactionTypeEnum";
+import TransactionInput from "../lib/TransactionInput";
 
 const BLOCKCHAIN_SERVER = process.env.BLOCKCHAIN_SERVER;
 
@@ -19,7 +22,7 @@ function menu() {
     setTimeout(() => {
         console.clear();
 
-        if(myWalletPbK){
+        if (myWalletPbK) {
             console.log(`Logged @: ${myWalletPbK}.`);
         } else {
             console.log("Aren't logged.");
@@ -34,8 +37,8 @@ function menu() {
         console.log("6 - Exit");
 
         rdl.question("[>] Choose Your Option: ", (answer) => {
-            
-            switch(answer) {
+
+            switch (answer) {
                 case "1":
                     createWallet();
                     break;
@@ -65,13 +68,13 @@ function menu() {
     }, 1000);
 }
 
-function prevMenu(){
-    rdl.question("\n[>] Press any key to continue ...", ()=>{
+function prevMenu() {
+    rdl.question("\n[>] Press any key to continue ...", () => {
         menu();
     });
 }
 
-function logout(){
+function logout() {
     console.log("\n[!]You are being logged out.");
     myWalletPbK = "";
     myWalletPvK = "";
@@ -82,12 +85,12 @@ function logout(){
 
 function createWallet() {
     console.clear();
-    
+
     const wallet = new Wallet();
 
     myWalletPbK = wallet.publicKey;
     myWalletPvK = wallet.privateKey;
-    
+
     console.log("[+] Your new wallet has been created:");
     console.log(wallet);
     console.log("\n[!] Save this information, do not share your private key.");
@@ -96,14 +99,14 @@ function createWallet() {
 
 }
 
-function recoverWallet(){
+function recoverWallet() {
     console.clear();
 
     let pv
 
-    rdl.question("[>] Inform your private key or WIF? ", (wifOrPvk)=>{
+    rdl.question("[>] Inform your private key or WIF? ", (wifOrPvk) => {
 
-        if(!wifOrPvk){
+        if (!wifOrPvk) {
             createWallet();
         }
 
@@ -120,11 +123,11 @@ function recoverWallet(){
 
 function getBalance() {
     console.clear();
-    if(!myWalletPbK){
+    if (!myWalletPbK) {
         console.log("[!] You don't have a wallet yet.");
         return prevMenu();
     }
-    
+
     //! TODO: GET BALANCE BY API
     console.log("[!] SORRY, COMING SOON!");
 
@@ -134,13 +137,61 @@ function getBalance() {
 function sendTx() {
     console.clear();
 
-    if(!myWalletPbK){
+    if (!myWalletPbK) {
         console.log("[!] You don't have a wallet yet.");
         return prevMenu();
     }
-    
+
     //! TODO: SEND TX BY API
-    console.log("[!] SORRY, COMING SOON!");
+    console.log(`[+] Your wallet @ ${myWalletPbK}`);
+
+    rdl.question("[>] Send To Wallet: ", (toWallet) => {
+
+        if (toWallet.length < 66 && toWallet !== myWalletPbK) {
+            console.log(`[!] Invalid wallet: ${toWallet}`);
+            return prevMenu();
+        }
+
+        rdl.question("Amount: ", async (amountStr) => {
+            
+            const amount = parseInt(amountStr);
+
+            if (!amount) {
+                console.log(`[!] Invalid amount: ${amount}`);
+                return prevMenu();
+            }
+
+            //!TODO:: BALANCE VALIDATION
+
+            const tx = new Transaction();
+            tx.timestamp = Date.now();
+            tx.to = toWallet;
+            tx.type = TransactionTypeEnum.REGULAR;
+            tx.txInput = new TransactionInput({
+                amount,
+                fromAddress: myWalletPbK,
+            } as TransactionInput);
+
+            tx.txInput.sign(myWalletPvK);
+            tx.hash = tx.getHash();
+
+            console.log(tx.isValid());
+
+            try {
+
+                const txResponse = await axios.post(`${BLOCKCHAIN_SERVER}/transactions/`, tx);
+                console.log("\nTransaction accepted. Waiting the miners");
+                console.log(`\nTransaction Hash: ${txResponse.data.hash}`);
+
+            } catch(err: any){
+                console.error(`[!] ${err.response ? err.response.data : err.message}`);
+            }
+
+            return prevMenu();
+
+        });
+
+    });
 
     prevMenu();
 }
